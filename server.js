@@ -19,7 +19,6 @@ app.use(
 
 app.use(async (ctx) => {
   const requestQuery = ctx.request.query;
-  console.log(requestQuery);
   const requestBody = ctx.request.body;
   let method, id, name, description;
   if (requestQuery) {
@@ -34,18 +33,13 @@ app.use(async (ctx) => {
   let ticket;
 
   switch (method) {
-
     case "allTickets":
-        // http://localhost:7070/?method=allTickets
       ctx.response.body = ticketStorage.allTickets();
-      console.log('--GET all Tickets--');
       ctx.response.status = 200;
       return;
 
     case "ticketById":
-        // ?method=ticketById&id=${id}
       ticket = ticketStorage.ticketById(Number(id));
-      console.log('--GET Ticket by ID--');
       if (ticket) {
         ctx.response.body = ticket;
         ctx.response.status = 200;
@@ -56,18 +50,14 @@ app.use(async (ctx) => {
       return;
 
     case "createTicket":
-        // ?method=createTicket
       ctx.response.body = ticketStorage.createTicket(name, description);
-      console.log('--Create Ticket--');
       ctx.response.status = 201;
       return;
 
     case "changeStatus":
-        // ?method=changeStatus&id=${id}
       ticket = ticketStorage.ticketById(Number(id));
-      console.log('--Change Ticket Status by ID--');
       if (ticket) {
-        ticket.toggleStatus();
+        ticket.changeStatus();
         ctx.response.body = ticket;
         ctx.response.status = 200;
       } else {
@@ -77,8 +67,6 @@ app.use(async (ctx) => {
       return;
 
     case "editTicket":
-        // ?method=editTicket&id=${id}
-        console.log('--Edit Ticket by ID--');
       ticket = ticketStorage.editTicket(Number(id), name, description);
       if (ticket) {
         ctx.response.body = ticket;
@@ -90,8 +78,6 @@ app.use(async (ctx) => {
       return;
 
     case "deleteTicket":
-        // ?method=deleteTicket&id=${id}
-        console.log('--Delete Ticket by ID--');
       if (ticketStorage.deleteTicket(Number(id))) {
         ctx.response.body = "OK";
         ctx.response.status = 204;
@@ -105,14 +91,15 @@ app.use(async (ctx) => {
   }
 });
 
-
+// server part
 const server = http.createServer(app.callback());
 const port = 7070;
+
 server.listen(port, (err) => {
   if (err) {
     console.log(err);
     return;
   }
-
   console.log("Server is listening to " + port);
 });
+
